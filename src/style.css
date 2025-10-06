@@ -1,6 +1,10 @@
 html, body {
     height: 100%;
 }
+.navbar-brand.btn {
+    border: none !important;
+    box-shadow: none !important;
+}
 
 body {
     display: flex;
