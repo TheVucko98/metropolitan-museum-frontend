@@ -9,5 +9,8 @@
   "private": true,
   "devDependencies": {
     "lite-server": "^2.6.1"
+  },
+  "dependencies": {
+    "cors-anywhere": "^0.4.4"
   }
 }

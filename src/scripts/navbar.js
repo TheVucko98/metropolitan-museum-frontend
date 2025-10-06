@@ -15,7 +15,9 @@ export function loadNavbar(){
                 const menu = document.getElementById("departmentsMenu");
                 data.departments.forEach(dep => {
                     const li = document.createElement("li");
-                    li.innerHTML = `<a class="dropdown-item" href="department.html?depId=${dep.departmentId}">${dep.displayName}</a>`;
+                    li.innerHTML = `<a class="dropdown-item btn "  
+                        onclick="loadDepartment(${dep.departmentId})">${dep.displayName}</a>`;
+
                     menu.appendChild(li);
                 });
             })
@@ -33,6 +35,7 @@ export function loadNavbar(){
         });
     }
 }
+
 export function goToAbout(){
     fetch("../components/about.html")
         .then(response => response.text())
@@ -50,6 +53,4 @@ export function goToHome(){
         .catch(err => console.error("Error loading home:", err));
 }
 
-window.goToAbout = goToAbout;
 
-window.goToHome = goToHome;
