@@ -1,0 +1,13 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#pageContent {
+    flex: 1; /* ovo gura footer ka dnu */
+}
