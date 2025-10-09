@@ -19,4 +19,7 @@ import {loadObjectDetail} from "./scripts/itemDetails.js";
 
 window.loadObjectDetail = loadObjectDetail;
 
+import {getSearchResults} from "./scripts/search.js";
+
+window.getSearchResults = getSearchResults;
 
