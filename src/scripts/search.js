@@ -12,15 +12,15 @@ export function getSearchResults(query) {
         .catch(err => console.error("Error loading department page:", err));
 }
 
-let cachedObjects = {};
-
+let cachedObjectsPerSearchQuery = {};
+import {itemsPerPage} from "./cachedDataForFetches.js";
 function loadSearchData(query,page){
-    const itemsPerPage = 15;
+
 
 
     // ako već imamo fetch-ovane i sortirane objekte, koristimo ih
-    if (cachedObjects[query]) {
-        renderSearchObjectsPage(cachedObjects[query], page, itemsPerPage);
+    if (cachedObjectsPerSearchQuery[query]) {
+        renderSearchObjectsPage(cachedObjectsPerSearchQuery[query], page, itemsPerPage);
     } else {
 
         // fetch svih objekata u departmanu
@@ -29,14 +29,15 @@ function loadSearchData(query,page){
             .then(res => res.json())
             .then(data => {
                 let allObjects = data.objectIDs || [];
-                console.log(allObjects);
-                console.log("\n");
+
                 allObjects.sort((a, b) => a - b); // sortiramo po ID rastuće
-                cachedObjects[query] = allObjects; // čuvamo u cache
+                cachedObjectsPerSearchQuery[query] = allObjects; // čuvamo u cache
                 renderSearchObjectsPage(allObjects, page, itemsPerPage);
             });
     }
 }
+import { fetchObjectDataUsingID} from "./cachedDataForFetches.js";
+
 function renderSearchObjectsPage(allObjects, page, itemsPerPage) {
     const totalObjects = allObjects.length;
     const totalPages = Math.ceil(totalObjects / itemsPerPage);
@@ -65,8 +66,7 @@ function renderSearchObjectsPage(allObjects, page, itemsPerPage) {
         const col = document.createElement("div");
         col.className = "col-md-2 text-center";
 
-        fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${objId}`)
-            .then(res => res.json())
+        fetchObjectDataUsingID(objId)
             .then(objData => {
                 const img = document.createElement("img");
                 img.src = objData.primaryImageSmall || "../assets/noImage.png";

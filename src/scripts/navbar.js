@@ -1,3 +1,5 @@
+let cachedDepartmentNames;
+
 export function loadNavbar(){
     fetch("components/navbar.html")
         .then(response => response.text())
@@ -8,20 +10,35 @@ export function loadNavbar(){
         })
         .catch(err => console.error("Error loading navbar :", err));
 
+
     function loadDepartments() {
-        fetch("https://collectionapi.metmuseum.org/public/collection/v1/departments")
-            .then(res => res.json())
-            .then(data => {
-                const menu = document.getElementById("departmentsMenu");
-                data.departments.forEach(dep => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `<a class="dropdown-item btn "  
+        if (cachedDepartmentNames) {
+            const menu = document.getElementById("departmentsMenu");
+            cachedDepartmentNames.forEach(dep => {
+                const li = document.createElement("li");
+                li.innerHTML = `<a class="dropdown-item btn "  
                         onclick="loadDepartment(${dep.departmentId})">${dep.displayName}</a>`;
 
-                    menu.appendChild(li);
-                });
-            })
-            .catch(err => console.error("Error loading departments:", err));
+                menu.appendChild(li);
+            });
+        } else {
+            fetch("https://collectionapi.metmuseum.org/public/collection/v1/departments")
+                .then(res => res.json())
+                .then(data => {
+                    cachedDepartmentNames = data.departments;
+                    const menu = document.getElementById("departmentsMenu");
+                    cachedDepartmentNames.forEach(dep => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `<a class="dropdown-item btn "  
+                        onclick="loadDepartment(${dep.departmentId})">${dep.displayName}</a>`;
+
+                        menu.appendChild(li);
+                    });
+
+                })
+                .catch(err => console.error("Error loading departments:", err));
+        }
+
     }
 
     function setupSearch() {

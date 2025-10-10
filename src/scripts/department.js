@@ -8,24 +8,32 @@ export function loadDepartment(depId) {
         .catch(err => console.error("Error loading department page:", err));
 }
 
-let cachedObjects = {}; // Map for every dep we will save "sorted array of ids of object IDs"
+let cachedObjectsByDepartment = {}; // Map for every dep we will save "sorted array of ids of object IDs"
+let cachedDepartmentNameById = {}
+import {itemsPerPage} from "./cachedDataForFetches.js";
+
 
 function loadDepartmentData(depId, page) {
-    const itemsPerPage = 15;
-
-    // fetch imena departmana
-    fetch(`https://collectionapi.metmuseum.org/public/collection/v1/departments`)
-        .then(res => res.json())
-        .then(data => {
-            const dep = data.departments.find(d => d.departmentId === depId);
-            if (dep) {
+    let dep;
+    if(cachedDepartmentNameById[depId]) {
+        dep = cachedDepartmentNameById[depId];
+        document.getElementById("depName").textContent = dep.displayName;
+    }else{
+        fetch(`https://collectionapi.metmuseum.org/public/collection/v1/departments`)
+            .then(res => res.json())
+            .then(data => {
+                dep = data.departments.find(d => d.departmentId === depId);
+                cachedDepartmentNameById[depId] = dep;
                 document.getElementById("depName").textContent = dep.displayName;
-            }
-        });
+            });
+    }
+
+
+    //
 
     // ako već imamo fetch-ovane i sortirane objekte, koristimo ih
-    if (cachedObjects[depId]) {
-        renderObjectsPage(cachedObjects[depId], page, itemsPerPage);
+    if (cachedObjectsByDepartment[depId]) {
+        renderObjectsPage(cachedObjectsByDepartment[depId], page, itemsPerPage);
     } else {
         // fetch svih objekata u departmanu
         fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds=${depId}`)
@@ -33,11 +41,13 @@ function loadDepartmentData(depId, page) {
             .then(data => {
                 let allObjects = data.objectIDs || [];
                 allObjects.sort((a, b) => a - b); // sortiramo po ID rastuće
-                cachedObjects[depId] = allObjects; // čuvamo u cache
+                cachedObjectsByDepartment[depId] = allObjects; // čuvamo u cache
                 renderObjectsPage(allObjects, page, itemsPerPage);
             });
     }
 }
+
+import { fetchObjectDataUsingID} from "./cachedDataForFetches.js";
 
 function renderObjectsPage(allObjects, page, itemsPerPage) {
     const totalObjects = allObjects.length;
@@ -77,8 +87,7 @@ function renderObjectsPage(allObjects, page, itemsPerPage) {
         col.className = "col-md-2 text-center"; // 5 po redu
         // Dolaze konkurentno pa objekti na stranici mogu ici razlicitim redom u zavisnosti koji 1. dodje
         // ali za stranicu npr 7 uvek istih "n" objekata, samo nisu isto uvek sortirani
-        fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${objId}`)
-            .then(res => res.json())
+        fetchObjectDataUsingID(objId)
             .then(objData => {
                 const img = document.createElement("img");
                 img.src = objData.primaryImageSmall || "../assets/noImage.png";
