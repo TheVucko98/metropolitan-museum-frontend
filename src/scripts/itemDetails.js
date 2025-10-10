@@ -1,4 +1,4 @@
-export function loadObjectDetail(objId) {
+export function loadObjectDetail(objId,takenFromStack = 0) {
     const pageContent = document.getElementById("pageContent");
     pageContent.innerHTML = "<p>Loading...</p>";
 
@@ -21,7 +21,11 @@ export function loadObjectDetail(objId) {
             document.getElementById("itemDate").textContent = objData.objectDate || "N/A";
             document.getElementById("itemMedium").textContent = objData.medium || "N/A";
             document.getElementById("itemCulture").textContent = objData.culture || "N/A";
-
+            if(takenFromStack === 0) {
+                const stateObj = { pageType: 'itemDetails',"objId" : objId };
+                const url = `/?itemName=${objData.title || "Unknown Title"}`;
+                history.pushState(stateObj, `detailsItem`, url);
+            }
             // 4️⃣ Dugme za povratak (možeš povezati sa home view)
             document.getElementById("backButton").addEventListener("click", (e) => {
                 e.preventDefault();

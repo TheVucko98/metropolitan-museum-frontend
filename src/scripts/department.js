@@ -1,9 +1,12 @@
-export function loadDepartment(depId) {
+export function loadDepartment(depId,page = 1,takenFromStack = 0) {
     fetch(`./components/department.html`)
         .then(res => res.text())
         .then(html => {
             document.getElementById("pageContent").innerHTML = html;
-            loadDepartmentData(depId, 1); // počinjemo od prve stranice
+
+            loadDepartmentData(depId, page,takenFromStack); // First page
+
+
         })
         .catch(err => console.error("Error loading department page:", err));
 }
@@ -13,7 +16,7 @@ let cachedDepartmentNameById = {}
 import {itemsPerPage} from "./cachedDataForFetches.js";
 
 
-function loadDepartmentData(depId, page) {
+export function loadDepartmentData(depId, page,takenFromStack = 0) {
     let dep;
     if(cachedDepartmentNameById[depId]) {
         dep = cachedDepartmentNameById[depId];
@@ -33,7 +36,7 @@ function loadDepartmentData(depId, page) {
 
     // ako već imamo fetch-ovane i sortirane objekte, koristimo ih
     if (cachedObjectsByDepartment[depId]) {
-        renderObjectsPage(cachedObjectsByDepartment[depId], page, itemsPerPage);
+        renderObjectsPage(cachedObjectsByDepartment[depId], page, itemsPerPage,depId,takenFromStack);
     } else {
         // fetch svih objekata u departmanu
         fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds=${depId}`)
@@ -42,14 +45,23 @@ function loadDepartmentData(depId, page) {
                 let allObjects = data.objectIDs || [];
                 allObjects.sort((a, b) => a - b); // sortiramo po ID rastuće
                 cachedObjectsByDepartment[depId] = allObjects; // čuvamo u cache
-                renderObjectsPage(allObjects, page, itemsPerPage);
+                renderObjectsPage(allObjects, page, itemsPerPage,depId,takenFromStack);
             });
     }
 }
 
 import { fetchObjectDataUsingID} from "./cachedDataForFetches.js";
 
-function renderObjectsPage(allObjects, page, itemsPerPage) {
+function renderObjectsPage(allObjects, page, itemsPerPage,depId,takenFromStack = 0) {
+    if(takenFromStack === 0) {
+        const stateObj = { pageType: 'department',"departmentID" : depId,"pageNumber" : page };
+        const url = `/?departmentID=${depId}&pageNumber=${page}`;
+        history.pushState(stateObj, `Department ${depId}`, url);
+    }
+
+
+
+
     const totalObjects = allObjects.length;
     const totalPages = Math.ceil(totalObjects / itemsPerPage);
     const offset = (page - 1) * itemsPerPage;
@@ -94,15 +106,17 @@ function renderObjectsPage(allObjects, page, itemsPerPage) {
                 img.className = "img-fluid";
                 img.alt = objData.title || "No Title";
 
-                const title = document.createElement("a");
-                title.href = "#";
+                const title = document.createElement("button");
+                title.type = "button";
                 title.textContent = objData.title || "No Title";
-                title.className = "d-block mt-2";
+                title.className = "btn btn-link mt-2";
+                title.style.display = "block";           // This styles, because it didnt stand in center
+                title.style.width = "100%";
+                title.style.textAlign = "center";
                 title.onclick = (e) => {
-
                     loadObjectDetail(objId);
-
                 };
+
 
                 const objid = document.createElement("h4");
                 objid.textContent = objId; // ili innerHTML ako treba HTML
@@ -133,7 +147,7 @@ function renderObjectsPage(allObjects, page, itemsPerPage) {
         if (!isActive && !isDisabled) {
             a.addEventListener("click", e => {
                 e.preventDefault();
-                renderObjectsPage(allObjects, pageNumber, itemsPerPage);
+                renderObjectsPage(allObjects, pageNumber, itemsPerPage,depId);
             });
         }
         li.appendChild(a);

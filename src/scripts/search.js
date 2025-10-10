@@ -1,4 +1,4 @@
-export function getSearchResults(query) {
+export function getSearchResults(query,page=1,takenFromStack = 0) {
     if(query === "" || !query || query.length > 20) {
         return;
     }
@@ -7,20 +7,20 @@ export function getSearchResults(query) {
         .then(html => {
             document.getElementById("pageContent").innerHTML = html;
             document.getElementById("searchQuery").textContent = "Search query : " + query;
-            loadSearchData(query,1);
+            loadSearchData(query,page,takenFromStack);
         })
         .catch(err => console.error("Error loading department page:", err));
 }
 
 let cachedObjectsPerSearchQuery = {};
 import {itemsPerPage} from "./cachedDataForFetches.js";
-function loadSearchData(query,page){
+function loadSearchData(query,page,takenFromStack = 0) {
 
 
 
     // ako već imamo fetch-ovane i sortirane objekte, koristimo ih
     if (cachedObjectsPerSearchQuery[query]) {
-        renderSearchObjectsPage(cachedObjectsPerSearchQuery[query], page, itemsPerPage);
+        renderSearchObjectsPage(cachedObjectsPerSearchQuery[query], page, itemsPerPage,query,takenFromStack);
     } else {
 
         // fetch svih objekata u departmanu
@@ -32,13 +32,19 @@ function loadSearchData(query,page){
 
                 allObjects.sort((a, b) => a - b); // sortiramo po ID rastuće
                 cachedObjectsPerSearchQuery[query] = allObjects; // čuvamo u cache
-                renderSearchObjectsPage(allObjects, page, itemsPerPage);
+                renderSearchObjectsPage(allObjects, page, itemsPerPage,query,takenFromStack);
             });
     }
 }
 import { fetchObjectDataUsingID} from "./cachedDataForFetches.js";
 
-function renderSearchObjectsPage(allObjects, page, itemsPerPage) {
+function renderSearchObjectsPage(allObjects, page, itemsPerPage,query,takenFromStack = 0) {
+    if(takenFromStack === 0) {
+        const stateObj = { pageType: 'search',"query" : query,"pageNumber" : page };
+        const url = `/?Search=${query}`;
+        history.pushState(stateObj, ``, url);
+    }
+
     const totalObjects = allObjects.length;
     const totalPages = Math.ceil(totalObjects / itemsPerPage);
     const offset = (page - 1) * itemsPerPage;
@@ -74,7 +80,7 @@ function renderSearchObjectsPage(allObjects, page, itemsPerPage) {
                 img.alt = objData.title || "No Title";
 
                 const title = document.createElement("a");
-                title.href = "#";
+                title.href = "";
                 title.textContent = objData.title || "No Title";
                 title.className = "d-block mt-2";
                 title.onclick = () => loadObjectDetail(objId);
@@ -102,7 +108,7 @@ function renderSearchObjectsPage(allObjects, page, itemsPerPage) {
         if (!isActive && !isDisabled) {
             a.addEventListener("click", e => {
                 e.preventDefault();
-                renderSearchObjectsPage(allObjects, pageNumber, itemsPerPage);
+                renderSearchObjectsPage(allObjects, pageNumber, itemsPerPage,query,takenFromStack);
             });
         }
         li.appendChild(a);

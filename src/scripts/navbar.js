@@ -53,19 +53,29 @@ export function loadNavbar(){
     }
 }
 
-export function goToAbout(){
+export function goToAbout(takenFromStack = 0){
     fetch("../components/about.html")
         .then(response => response.text())
         .then(html => {
             document.getElementById("pageContent").innerHTML = html;
+            if(takenFromStack === 0) {
+                const stateObj = { pageType: 'about' };
+                const url = "/about";
+                history.pushState(stateObj, "", url);
+            }
         })
         .catch(err => console.error("Error loading home:", err));
 }
-export function goToHome(){
+export function goToHome(takenFromStack = 0){
     fetch("components/home.html")
         .then(response => response.text())
         .then(html => {
             document.getElementById("pageContent").innerHTML = html;
+            if(takenFromStack === 0) {
+                const stateObj = { pageType: 'home' };
+                const url = "/home";
+                history.pushState(stateObj, "", url);
+            }
         })
         .catch(err => console.error("Error loading home:", err));
 }

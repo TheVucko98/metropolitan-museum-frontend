@@ -1,0 +1,2 @@
+Need to implement back and forth in browser with "push and pop ?"
+Search query does not work as intended.
