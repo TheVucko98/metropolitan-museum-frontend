@@ -1,2 +1,3 @@
-Need to implement back and forth in browser with "push and pop ?"
-Search query does not work as intended.
+Be able to acces
+http://localhost:3000/?departmentID=5&pageNumber=1
+from get go.

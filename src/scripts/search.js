@@ -7,6 +7,8 @@ export function getSearchResults(query,page=1,takenFromStack = 0) {
         .then(html => {
             document.getElementById("pageContent").innerHTML = html;
             document.getElementById("searchQuery").textContent = "Search query : " + query;
+            document.getElementById("searchContent").innerHTML = `<div class="text-center mt-5 " ><h1 class="text-danger">Loading results...</h1></div>`;
+
             loadSearchData(query,page,takenFromStack);
         })
         .catch(err => console.error("Error loading department page:", err));
@@ -23,7 +25,7 @@ function loadSearchData(query,page,takenFromStack = 0) {
         renderSearchObjectsPage(cachedObjectsPerSearchQuery[query], page, itemsPerPage,query,takenFromStack);
     } else {
 
-        // fetch svih objekata u departmanu
+        // fetch by title does not work as intended
         //fetch(`https://collectionapi.metmuseum.org/public/collection/v1/search?q=${query}&title=false`)
         fetch(`https://collectionapi.metmuseum.org/public/collection/v1/search?q=${query}`)
             .then(res => res.json())
@@ -80,7 +82,7 @@ function renderSearchObjectsPage(allObjects, page, itemsPerPage,query,takenFromS
                 img.alt = objData.title || "No Title";
 
                 const title = document.createElement("a");
-                title.href = "";
+                title.href = "javascript:void(0)";
                 title.textContent = objData.title || "No Title";
                 title.className = "d-block mt-2";
                 title.onclick = () => loadObjectDetail(objId);

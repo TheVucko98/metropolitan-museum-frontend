@@ -23,7 +23,7 @@ export function loadObjectDetail(objId,takenFromStack = 0) {
             document.getElementById("itemCulture").textContent = objData.culture || "N/A";
             if(takenFromStack === 0) {
                 const stateObj = { pageType: 'itemDetails',"objId" : objId };
-                const url = `/?itemName=${objData.title || "Unknown Title"}`;
+                const url = `/?objId=${objId}`;
                 history.pushState(stateObj, `detailsItem`, url);
             }
             // 4️⃣ Dugme za povratak (možeš povezati sa home view)
