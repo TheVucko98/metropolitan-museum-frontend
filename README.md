@@ -15,4 +15,5 @@ It uses the museum's public **API** to fetch and display artworks directly on th
    cd metropolitan-museum-frontend
 
 3. **Start the project**
+    ```bash
     npm start
