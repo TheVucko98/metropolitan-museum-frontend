@@ -1,6 +1,6 @@
 const cachedLRUObjects = new Map();
 export  const itemsPerPage = 15;
-const MAX_CACHE_SIZE = 10*itemsPerPage;
+const MAX_CACHE_SIZE = 50*itemsPerPage;
 
 
 

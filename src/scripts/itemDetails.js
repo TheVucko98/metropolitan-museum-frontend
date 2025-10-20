@@ -1,4 +1,5 @@
-export function loadObjectDetail(objId,takenFromStack = 0) {
+export function
+loadObjectDetail(objId,takenFromStack = 0) {
     const pageContent = document.getElementById("pageContent");
     pageContent.innerHTML = "<p>Loading...</p>";
 
