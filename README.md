@@ -1,7 +1,8 @@
 # 🖼️ Metropolitan Museum Frontend
 
 Frontend made for **Metropolitan Museum**.  
-It uses the museum's public **API** to fetch and display artworks directly on the site.
+It uses the museum's public **API** to fetch and display artworks directly on the site.  
+The site is built as a **SPA (Single Page Application)** — content parts are dynamically interchanged.
 
 ---
 
@@ -13,7 +14,3 @@ It uses the museum's public **API** to fetch and display artworks directly on th
 2. **Navigate to the project folder**
    ```bash
    cd metropolitan-museum-frontend
-
-3. **Start the project**
-    ```bash
-    npm start
